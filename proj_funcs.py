@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 import sys
 from scipy.io import loadmat
 
@@ -20,9 +20,9 @@ def load_data(xRay_csvFile, flareIR_mFile, delimiter=','):
     file.close()
     
     try:
-        dict304 = loadmat(flareIR_mfile, variablenames=['vec304','vectime','windowstart2','filt304','errev'])
+        dict304 = loadmat(flareIR_mFile, variable_names=['vec304','vectime','windowstart2','filt304','vecerr'])
     except FileNotFoundError:
-        print(f"FileNotFoundError: File '{flareIR_mfile}' doesn't exist.",
+        print(f"FileNotFoundError: File '{flareIR_mFile}' doesn't exist.",
               file=sys.stderr)
         sys.exit(1)
     
@@ -31,17 +31,17 @@ def load_data(xRay_csvFile, flareIR_mFile, delimiter=','):
     vectime = dict304['vectime']
     wind_st = dict304['windowstart2']
     sq304 = dict304['filt304']
-    err304 = dict304['errev']
+    vecerr = dict304['vecerr']
     
-    return Xray_data_all, vec304, vectime, wind_st, sq304, err304
+    return Xray_data_all, vec304, vectime, vecerr, wind_st, sq304
     
-def determine_flares(Xray_data_all, vec304, vectime, wind_st, st_in, end_in, ind)
+def determine_flares(Xray_data_all, vec304, vectime, wind_st, sq304, vecerr, ind):
 
     #takes input of window start time and window start time of next flare
     #run this once for each flare
     
-    wst = wind_st[ind]
-    wst_n = wind_st[ind + 1]
+    wst = wind_st[0][ind]
+    wst_n = wind_st[0][ind + 1]
     
     #expand window - 2 hours before, start, 3.5 hours after start
     wst_b = wst - (2/24)
@@ -52,7 +52,7 @@ def determine_flares(Xray_data_all, vec304, vectime, wind_st, st_in, end_in, ind
     eventi = np.where(np.logical_and(vectime >= wst_b, vectime < wend))
     
     #identify larger window
-    eventi_larger = np.where(np.logical_and(vectime >= (wst_b-(12/24), vectime < (wend + 12/24))))
+    eventi_larger = np.where(np.logical_and(vectime >= (wst_b-(12/24)), vectime < (wend + 12/24)))
     
     #error check - flares overlap? If so, go to next
     if wend > wst_n:
@@ -66,7 +66,7 @@ def determine_flares(Xray_data_all, vec304, vectime, wind_st, st_in, end_in, ind
     # need to find where nan?
     timeev = vectime[eventi]
     #define solar quiet
-    sqev = filt304[eventi]
+    sqev = sq304[eventi]
     #define error series
     errev = vecerr[eventi]
     
@@ -91,12 +91,8 @@ def determine_flares(Xray_data_all, vec304, vectime, wind_st, st_in, end_in, ind
     for i in range(1,len(irrev)-1):
         if irrev[i] < (irrev[i - 1] - irrstd):
             irrev[i] = np.nan
-
-    # LAST STEP IN THIS FUNCTION - CHECK NAN FUNCTIONALITY
-    # I.E. DOES PYTHON USE NAN THE SAME WAY? DO WE HAVE TO ACCOUNT FOR THEM?
-    # ALSO, CAN WE USE NUMPY? I THINK I CAN WRITE ALL FUNCTIONS IN BUILT-IN PYTHON.
     
-    return irrev, irrstd, sqev, sqstd, timeev, diff, irrmean
+    return irrev, irrstd, sqev, errev, sqstd, timeev, diff, irrmean
             
     
                                        
