@@ -2,6 +2,7 @@ import numpy as np
 import sys
 from scipy.io import loadmat
 
+
 def load_data(xRay_csvFile, flareIR_mFile, delimiter=','):
     Xray_data_all = []
     
@@ -122,8 +123,7 @@ def find_other_parameters(j, timeev, tst, irrev, sqev, irrstd, num, starti, endj
     else:
         tend = timeev[starti]
         m = 0
-        j = starti + 40
-        for j in range(len(diff)):
+        for j in range(starti + 40, len(diff)):
             if diff[j] < num:
                 m += 1
                 if m == 50:
@@ -140,16 +140,16 @@ def find_other_parameters(j, timeev, tst, irrev, sqev, irrstd, num, starti, endj
             sqwindow = sqev[starti:endj]
             sq = sqev[1:starti]
             temp = len(window)-7
-            avgmeans = np.isnan(temp)
+            avgmeans = np.zeros(len(window)-7)
             k = 8
             maxind1 = float("-inf")
             # commented out till we figure out start and end time
-#             for k in range (len(window)-7):
-#                 avgmeans[k - 7] = np.nanmean(window[k-7:k+7])
-#                 maxind1 = max(maxind1, avgmeans[k - 7])
-#             # maxind1 = find(avgmeans == max(avgmeans))
-#             maxind = starti+maxind1
-#             maxt = timeev[maxind]
+            for k in range(8,len(window)):
+                avgmeans[k - 7] = np.nanmean(window[k-7:k+7])
+            maxind1 = np.where(avgmeans == max(avgmeans))
+        
+            maxind = starti+maxind1[0]
+            maxt = timeev[maxind]
 
     return tst, endj, starti, timeev, tend, maxt, tend
 
