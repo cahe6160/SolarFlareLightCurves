@@ -3,7 +3,6 @@ import sys
 from scipy.io import loadmat
 
 def load_data(xRay_csvFile, flareIR_mFile, delimiter=','):
-
     Xray_data_all = []
     
     try:
@@ -93,99 +92,64 @@ def determine_flares(Xray_data_all, vec304, vectime, wind_st, sq304, vecerr, ind
             irrev[i] = np.nan
     
     return irrev, irrstd, sqev, errev, sqstd, timeev, diff, irrmean
-            
-    
-def find_flare_start_time(diff, first, irrev, irrstd, j, lastj, starti, smSubTime, subTime, timeev, tst, num, second):
-    """
-    Parameters
-    ----------
-    first : boolean
-        This bool is used to run only certain lines of code if it's the absolute first time this function has been called.
-    irrev : list
-    irrstd : int  
-    j : int
-    lastj : int
-    starti : int
-    smSubTime : int
-    subTime : int
-    timeev : list
-    tst : int
-    num : int
-    second : boolean
-        This bool is used to run certain lines of code for the second set of times this function is called.
-    
-    Returns
-    -------
-    
-    """
+
+
+def find_flare_start_time(diff, irrev, irrstd, j, starti, smSubTime, subTime, timeev, tst, num, points):
+    print(len(irrev))
     while j < len(irrev): 
         if diff[j] > (2 * irrstd):
             num += 1
-            if first && num == 1:
-                lastj = j
             if num == points and j > (num + points): # 40 -> points 
-                if first:
-                    lastj = j
                 tst = timeev[j - subTime]
                 starti = j - subTime 
                 break
             elif num == points and j < (num + points):
-                if first:
-                    lastj = j
                 tst = timeev[j - smSubTime]
                 starti = j - smSubTime
                 break
-        elif second:
-            n = 0
+            j+=1
+        else:
+            j+=1
+        
     return irrev, irrstd, j, starti, timeev, tst
 
-def find_other_parameters(j, timeev, tst, irrev, sqev, irrstd, num):
-    """
-    Parameters
-    ----------
-    j : int
-    timeev : list
-    tst : int
-    irrev : list
-    sqev : list
-    irrstd : int  
-    num : int
-    
-    Returns
-    -------
-    
-    """
+def find_other_parameters(j, timeev, tst, irrev, sqev, irrstd, num, starti, endj, diff):
+    tend, maxt = 0, 0
     if starti > len(timeev) or endj > len(timeev):
         print('No classification of flare!')
     elif tst < timeev[1]:
         print('Start too early')
     else:
-        tst = timeev[starti]
+        tend = timeev[starti]
         m = 0
         j = starti + 40
         for j in range(len(diff)):
-            if diff(j) < num:
+            if diff[j] < num:
                 m += 1
                 if m == 50:
                     endj = j
+                    print('endj', endj)
                     break
-        if np.nanstd(endj):
+        if np.isnan(endj):
             print('endj is NaN')
         else:
             tend = timeev[endj]
+            print('starti', starti, 'endj', endj)
             window = irrev[starti:endj]
             windowt = timeev[starti:endj]
             sqwindow = sqev[starti:endj]
             sq = sqev[1:starti]
-            avgmeans = NaN(len(window)-7,1)
+            temp = len(window)-7
+            avgmeans = np.isnan(temp)
             k = 8
             maxind1 = float("-inf")
-            for k in range (len(window)-7):
-                avgmeans[k - 7] = np.nanmean(window[k-7:k+7])
-                maxind1 = max(maxind1, avgmeans[k - 7])
-            # maxind1 = find(avgmeans == max(avgmeans))
-            maxind = starti+maxind1
-            maxt = timeev[maxind]
+            # commented out till we figure out start and end time
+#             for k in range (len(window)-7):
+#                 avgmeans[k - 7] = np.nanmean(window[k-7:k+7])
+#                 maxind1 = max(maxind1, avgmeans[k - 7])
+#             # maxind1 = find(avgmeans == max(avgmeans))
+#             maxind = starti+maxind1
+#             maxt = timeev[maxind]
 
     return tst, endj, starti, timeev, tend, maxt, tend
 
@@ -206,7 +170,7 @@ def store_times(endj, starti, timeev, tst, tend, maxt):
     """
     # Critical times for that flare have been found (well, assuming it was nicely behaved enough for the code)! 
     # Store the times in arrays initialized above
-    if ~np.nanstd(endj) and starti<len(timeev) and endj < len(timeev) && starti<endj:
+    if ~np.nanstd(endj) and starti<len(timeev) and endj < len(timeev) and starti<endj:
         starttimes.append(tst)
         endtimes.append(tend)
         maxtimes.append(maxt)
