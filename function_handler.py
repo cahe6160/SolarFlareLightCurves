@@ -1,8 +1,9 @@
 import proj_funcs
+import matplotlib.pyplot as plt
 
-xr = '/home/jovyan/SolarFlareLightCurves/ribbondb_v1.0.csv'
+xr = '/home/jovyan/final_project/SolarFlareLightCurves/ribbondb_v1.0.csv'
 
-evef = '/home/jovyan/SolarFlareLightCurves/csci_proj_arr.mat'
+evef = '/home/jovyan/final_project/SolarFlareLightCurves/csci_proj_arr.mat'
 
 Xray_data_all, vec304, vectime, vecerr, wind_st, sq304 = proj_funcs.load_data(xr,evef)
 ind = 0
@@ -43,4 +44,16 @@ num = 0
 endj = 0
 tst, endj, starti, timeev, tend, maxt, tend = proj_funcs.find_other_parameters(j, timeev, tst, irrev, sqev, irrstd, num, starti, endj, diff)
 ################ lines 352 ################
+
+fig,ax = plt.subplots()
+ax.scatter(timeev,irrev*1000,c='blue',s=2,label='Flux')
+ax.axvline(tst,c='g',label='Start')
+ax.axvline(tend,c='r',label='End')
+ax.axvline(maxt,c='black',label='Peak')
+ax.grid()
+ax.legend()
+ax.set_xlabel('Time [datetime]',fontsize=12)
+ax.set_ylabel('Flux '+r'$[\mu W/m^2/s]$',fontsize=12)
+ax.set_title('Detected Parameters, Flare '+str(ind),fontsize=20)
+plt.savefig('lctest'+str(ind)+'.png')
     
