@@ -4,6 +4,7 @@ import argparse
 import configparser
 import sys
 
+
 def input_parser():
     """
     This function parses the filename for the UFO file, specifies the column
@@ -39,8 +40,9 @@ def input_parser():
 
     # Collect the parser inputs.
     inputs = my_parser.parse_args()
-    
+
     return inputs
+
 
 def main():
     """
@@ -71,8 +73,8 @@ def main():
         proj_funcs.determine_flares(Xray_data_all, vec304,
                                     vectime, wind_st, sq304, vecerr, ind)
 
-    # Initialize number of points exceeding large value - adding to this increases
-    # probability of finding the start of the flare
+    # Initialize number of points exceeding large value - adding to
+    # this increases probability of finding the start of the flare
     num = 0
 
     # Initialize start time variable
@@ -87,13 +89,13 @@ def main():
     points = 40
 
     # Number of points to "backpedal" from the found number of exceeded points,
-    # to identify actual start time. Reduce as necessary (to 30, 20, 10) for less
-    # stringent detection criteria.
+    # to identify actual start time. Reduce as necessary (to 30, 20, 10)
+    # for less stringent detection criteria.
     subTime = 80
 
     # A smaller backpedal, if we're very close to the start of the window, to
-    # avoid indexing issues. Reduce as necessary (to 29, 19, 9) for less stringent
-    # criteria ('points').
+    # avoid indexing issues. Reduce as necessary (to 29, 19, 9) for less
+    # stringent criteria ('points').
     smSubTime = 39
 
     # Run the function to find the flare start time.
@@ -124,8 +126,10 @@ def main():
                 j, starti, tst = proj_funcs.find_flare_start_time(diff, irrev,
                                                                   irrstd, j,
                                                                   smSubTime,
-                                                                  subTime, timeev,
-                                                                  tst, num, points)
+                                                                  subTime,
+                                                                  timeev,
+                                                                  tst, num,
+                                                                  points)
 
     # Now we have found the start time, the index of which is provided by 'j'
     startj = j
@@ -151,6 +155,7 @@ def main():
     ax.set_ylabel('Flux '+r'$[\mu W/m^2/s]$', fontsize=12)
     ax.set_title('Detected Parameters, Flare '+str(ind), fontsize=20)
     plt.savefig('lctest'+str(ind)+'.png')
+
 
 if __name__ == "__main__":
     main()
