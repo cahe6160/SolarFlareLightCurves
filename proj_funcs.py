@@ -158,12 +158,12 @@ def determine_flares(Xray_data_all, vec304, vectime, wind_st, sq304, vecerr,
 
     # Error check - do the nearby flares overlap? If so, go to next flare.
     if wend > wst_n:
-        eventi = np.where(np.logical_and(vectime >= wst_b, vectime < wstn))
+        eventi = np.where(np.logical_and(vectime >= wst_b, vectime < wst_n))
 
         # Identify larger window, as above.
-        eventi_larger = np.where(np.logical_and(vectime >= (wst_b-(12/24),
+        eventi_larger = np.where(np.logical_and(vectime >= (wst_b-(12/24)),
                                                             vectime <
-                                                            (wstn + 12/24))))
+                                                            (wst_n + 12/24)))
 
     # Define irradiance, time, solar quiet, error values for specific flare.
     irrev = vec304[eventi]
@@ -185,8 +185,8 @@ def determine_flares(Xray_data_all, vec304, vectime, wind_st, sq304, vecerr,
 
     # Identify and remove large spikes in data (erroneous)
     for i in range(1, len(irrev)-1):
-        if irrev[i] > (irrev[i-1]+2*irrstd) and irrev[i] > \
-                (irrev[i+1]+2*irrstd):
+        if irrev[i] > (irrev[i -1] + 2*irrstd) and irrev[i] > \
+                (irrev[i + 1] + 2*irrstd):
             irrev[i] = np.nan
 
     for i in range(1, len(irrev)-1):
@@ -197,7 +197,7 @@ def determine_flares(Xray_data_all, vec304, vectime, wind_st, sq304, vecerr,
 
 
 def find_flare_start_time(diff, irrev, irrstd, j, smSubTime, subTime, timeev,
-                          tst, num, points):
+                          tst, num, points, ind):
     """
 
     This function iteratively and autonomously finds the start time of the
@@ -238,6 +238,10 @@ def find_flare_start_time(diff, irrev, irrstd, j, smSubTime, subTime, timeev,
     points : int
         The number of points which need to be found above the flare standard
         deviation consecutively before the start time is identified.
+        
+    ind : int
+        The index corresponding to the flare to process - iterated over
+        externally.
 
     Returns
     -------
@@ -279,7 +283,7 @@ def find_flare_start_time(diff, irrev, irrstd, j, smSubTime, subTime, timeev,
 
 
 def find_other_parameters(timeev, tst, irrev, sqev, irrstd, starti, endj,
-                          diff):
+                          diff, ind):
     """
 
     This function iteratively and autonomously finds the peak and end times
@@ -311,6 +315,10 @@ def find_other_parameters(timeev, tst, irrev, sqev, irrstd, starti, endj,
 
     diff: list
         Contains the difference between the flux values and sq for this event.
+        
+    ind : int
+        The index corresponding to the flare to process - iterated over
+        externally.
 
     Returns
     -------
@@ -334,13 +342,13 @@ def find_other_parameters(timeev, tst, irrev, sqev, irrstd, starti, endj,
 
     # If there is overlap, or an indexing issue, exit loop and print error.
     if starti > len(timeev) or endj > len(timeev):
-        print('No classification of flare!')
+        print('No classification of flare, flare '+str(ind))
         return 0, 0, 0, 0
 
     # Otherwise, if the start time is before the time array, exit loop and
     # print error.
     elif tst < timeev[1]:
-        print('Start too early')
+        print('Calculated start too early, flare ',str(ind))
         return 0, 0, 0, 0
 
     # Otherwise, iterative over values to find the end time.
@@ -359,7 +367,6 @@ def find_other_parameters(timeev, tst, irrev, sqev, irrstd, starti, endj,
                 m += 1
                 if m == 50:
                     endj = j
-                    print('endj', endj)
                     break
 
         # Account for if this point is NaN.
@@ -379,12 +386,15 @@ def find_other_parameters(timeev, tst, irrev, sqev, irrstd, starti, endj,
             # Find the peak time by searching within a window of filtered
             # flux values.
             for k in range(8, len(window)):
-                avgmeans[k - 7] = np.nanmean(window[k-7:k+7])
+                try:
+                    avgmeans[k - 7] = np.nanmean(window[k-7:k+7])
+                except RuntimeWarning:
+                    print('Gap in the light curve data.')
 
             # Find the peak index and the max time.
             maxind1 = np.where(avgmeans == max(avgmeans))
             maxind = starti + maxind1[0]
-            maxt = timeev[maxind]
+            maxt = timeev[maxind][0]
 
     return endj, tend, maxind, maxt
 

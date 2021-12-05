@@ -1,7 +1,9 @@
 #!/bin/bash
 chmod +x run.sh
 
-config_file='/home/jovyan/SolarFlareLightCurves/config.ini'
+flaresumfile='/home/jovyan/final_project/SolarFlareLightCurves/flaresummaries.txt'
 
-python function_handler.py --config $config_file
+config_file='/home/jovyan/final_project/SolarFlareLightCurves/config.ini'
+
+python function_handler.py --config $config_file > $flaresumfile 2> errors.err
     
