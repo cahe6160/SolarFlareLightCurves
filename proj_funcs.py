@@ -162,8 +162,8 @@ def determine_flares(Xray_data_all, vec304, vectime, wind_st, sq304, vecerr,
 
         # Identify larger window, as above.
         eventi_larger = np.where(np.logical_and(vectime >= (wst_b-(12/24)),
-                                                            vectime <
-                                                            (wst_n + 12/24)))
+                                                vectime <
+                                                (wst_n + 12/24)))
 
     # Define irradiance, time, solar quiet, error values for specific flare.
     irrev = vec304[eventi]
@@ -185,8 +185,8 @@ def determine_flares(Xray_data_all, vec304, vectime, wind_st, sq304, vecerr,
 
     # Identify and remove large spikes in data (erroneous)
     for i in range(1, len(irrev)-1):
-        if irrev[i] > (irrev[i -1] + 2*irrstd) and irrev[i] > \
-                (irrev[i + 1] + 2*irrstd):
+        if irrev[i] > (irrev[i - 1] + 2 * irrstd) and irrev[i] > \
+                (irrev[i + 1] + 2 * irrstd):
             irrev[i] = np.nan
 
     for i in range(1, len(irrev)-1):
@@ -238,7 +238,7 @@ def find_flare_start_time(diff, irrev, irrstd, j, smSubTime, subTime, timeev,
     points : int
         The number of points which need to be found above the flare standard
         deviation consecutively before the start time is identified.
-        
+
     ind : int
         The index corresponding to the flare to process - iterated over
         externally.
@@ -315,7 +315,7 @@ def find_other_parameters(timeev, tst, irrev, sqev, irrstd, starti, endj,
 
     diff: list
         Contains the difference between the flux values and sq for this event.
-        
+
     ind : int
         The index corresponding to the flare to process - iterated over
         externally.
@@ -348,7 +348,7 @@ def find_other_parameters(timeev, tst, irrev, sqev, irrstd, starti, endj,
     # Otherwise, if the start time is before the time array, exit loop and
     # print error.
     elif tst < timeev[1]:
-        print('Calculated start too early, flare ',str(ind))
+        print('Calculated start too early, flare ', str(ind))
         return 0, 0, 0, 0
 
     # Otherwise, iterative over values to find the end time.
