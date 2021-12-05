@@ -158,12 +158,15 @@ def determine_flares(Xray_data_all, vec304, vectime, wind_st, sq304, vecerr,
 
     # Error check - do the nearby flares overlap? If so, go to next flare.
     if wend > wst_n:
-        eventi = np.where(np.logical_and(vectime >= wst_b, vectime < wstn))
+        print(wst_n)
+        print(wst_b)
+        print(len(vectime))
+        eventi = np.where(np.logical_and(vectime >= wst_b, vectime < wst_n))
 
         # Identify larger window, as above.
-        eventi_larger = np.where(np.logical_and(vectime >= (wst_b-(12/24),
+        eventi_larger = np.where(np.logical_and(vectime >= (wst_b-(12/24)),
                                                             vectime <
-                                                            (wstn + 12/24))))
+                                                            (wst_n + 12/24)))
 
     # Define irradiance, time, solar quiet, error values for specific flare.
     irrev = vec304[eventi]
@@ -185,8 +188,8 @@ def determine_flares(Xray_data_all, vec304, vectime, wind_st, sq304, vecerr,
 
     # Identify and remove large spikes in data (erroneous)
     for i in range(1, len(irrev)-1):
-        if irrev[i] > (irrev[i-1]+2*irrstd) and irrev[i] > \
-                (irrev[i+1]+2*irrstd):
+        if irrev[i] > (irrev[i -1] + 2*irrstd) and irrev[i] > \
+                (irrev[i + 1] + 2*irrstd):
             irrev[i] = np.nan
 
     for i in range(1, len(irrev)-1):
