@@ -158,9 +158,6 @@ def determine_flares(Xray_data_all, vec304, vectime, wind_st, sq304, vecerr,
 
     # Error check - do the nearby flares overlap? If so, go to next flare.
     if wend > wst_n:
-        print(wst_n)
-        print(wst_b)
-        print(len(vectime))
         eventi = np.where(np.logical_and(vectime >= wst_b, vectime < wst_n))
 
         # Identify larger window, as above.
@@ -397,7 +394,7 @@ def find_other_parameters(timeev, tst, irrev, sqev, irrstd, starti, endj,
             # Find the peak index and the max time.
             maxind1 = np.where(avgmeans == max(avgmeans))
             maxind = starti + maxind1[0]
-            maxt = timeev[maxind]
+            maxt = timeev[maxind][0]
 
     return endj, tend, maxind, maxt
 
