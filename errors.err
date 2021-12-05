@@ -1,6 +1,6 @@
-/home/jovyan/final_project/SolarFlareLightCurves/proj_funcs.py:393: RuntimeWarning: Mean of empty slice
+/home/jovyan/final_project/SolarFlareLightCurves/proj_funcs.py:390: RuntimeWarning: Mean of empty slice
   avgmeans[k - 7] = np.nanmean(window[k-7:k+7])
 /opt/conda/lib/python3.9/site-packages/numpy/lib/nanfunctions.py:1670: RuntimeWarning: Degrees of freedom <= 0 for slice.
   var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
-/home/jovyan/final_project/SolarFlareLightCurves/function_handler.py:158: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
+/home/jovyan/final_project/SolarFlareLightCurves/function_handler.py:159: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
   fig, ax = plt.subplots()
