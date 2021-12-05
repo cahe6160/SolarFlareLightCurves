@@ -68,12 +68,12 @@ def main():
 
     # Establish the flare index (or indices) to iterate over
     ind = 24
-    
+
     # Time storage
     startTimes = []
     endTimes = []
     maxTimes = []
-    
+
     for ind in range(ind):
         flareflag = 0
         print('################', ind, '################')
@@ -93,29 +93,30 @@ def main():
         j = 0
 
         # Initialize criteria for flare detection - how many successive points
-        # exceed the solar quiet before we find a flare? Reduce this value for less
-        # stringent criteria, if necessary, while looping (to 30, 20, 10).
+        # exceed the solar quiet before we find a flare? Reduce this value for
+        # lessstringent criteria, if necessary, while looping (to 30, 20, 10).
         points = 40
 
-        # Number of points to "backpedal" from the found number of exceeded points,
-        # to identify actual start time. Reduce as necessary (to 30, 20, 10)
-        # for less stringent detection criteria.
+        # Number of points to "backpedal" from the found number of exceeded
+        # points,to identify actual start time. Reduce as necessary (to 30,
+        # 20, 10) for less stringent detection criteria.
         subTime = 80
 
-        # A smaller backpedal, if we're very close to the start of the window, to
-        # avoid indexing issues. Reduce as necessary (to 29, 19, 9) for less
-        # stringent criteria ('points').
+        # A smaller backpedal, if we're very close to the start of the window,
+        # to avoid indexing issues. Reduce as necessary (to 29, 19, 9) for
+        # less stringent criteria ('points').
         smSubTime = 39
 
         # Run the function to find the flare start time.
         j, starti, tst = proj_funcs.find_flare_start_time(diff, irrev, irrstd,
                                                           j, smSubTime,
                                                           subTime, timeev,
-                                                          tst, num, points, 
-                                                         ind)
+                                                          tst, num, points,
+                                                          ind)
 
-        # Lower the criteria to find a flare, if the start time has not been found
-        # or the start time index is very large (unlikely to have found a flare).
+        # Lower the criteria to find a flare, if the start time has not been
+        # found or the start time index is very large (unlikely to have found
+        # a flare).
         if tst == 0 or starti > 1500:
             while points > 10:
                 if tst == 0 or starti > 1500:
@@ -126,46 +127,56 @@ def main():
                     if points == 20:
                         num = 0
                     # Run find_flare_start_time for less stringent criteria
-                    j, starti, tst = proj_funcs.find_flare_start_time(diff, irrev,
-                                                                      irrstd, j,
-                                                                      smSubTime,
+                    smSub = smSubTime
+                    j, starti, tst = proj_funcs.find_flare_start_time(diff,
+                                                                      irrev,
+                                                                      irrstd,
+                                                                      j,
+                                                                      smSub,
                                                                       subTime,
                                                                       timeev,
-                                                                      tst, num,
+                                                                      tst,
+                                                                      num,
                                                                       points,
-                                                                     ind)
+                                                                      ind)
                 else:
                     break
 
-        # Now we have found the start time, the index of which is provided by 'j'
+        # Now we have found the start time, the index provided by 'j'
         startj = j
 
-        # Begin the process of finding the rest of the flare parameters - initilize
-        # end index first.
+        # Begin the process of finding the rest of the flare parameters
+        # - initilize end index first.
         endj = 0
 
         # Run function to find end and peak times.
         endj, tend, maxind, maxt = \
             proj_funcs.find_other_parameters(timeev, tst, irrev, sqev, irrstd,
                                              starti, endj, diff, ind)
+
+        # Find flares with no found parameters.
         if endj == 0 and tend == 0 and maxind == 0 and maxt == 0:
             tend = np.nan
             maxt = np.nan
             tst = np.nan
             flareflag = 1
 
-        startTimes, endTimes, maxTimes = proj_funcs.store_times(endj, starti, timeev, tst, tend, maxt, startTimes, endTimes,
-                maxTimes)
-        
+        startTimes, endTimes, maxTimes = proj_funcs.store_times(endj, starti,
+                                                                timeev, tst,
+                                                                tend, maxt,
+                                                                startTimes,
+                                                                endTimes,
+                                                                maxTimes)
+
         if tst > 0 and tend > 0 and maxt > 0:
-            # Print the start time to the flare.
+            # Print the start time.
             print('Start time: ', tst)
 
-            # Print max time
-            print('Max time: ',maxt)
-            
-            # Print end time
-            print('End time: ',tend)
+            # Print max time.
+            print('Max time: ', maxt)
+
+            # Print end time.
+            print('End time: ', tend)
 
         if flareflag == 1:
             continue
@@ -181,16 +192,20 @@ def main():
         ax.set_xlabel('Time [datetime]', fontsize=12)
         ax.set_ylabel('Flux '+r'$[\mu W/m^2/s]$', fontsize=12)
         ax.set_title('Detected Parameters, Flare '+str(ind), fontsize=20)
-        plt.savefig('/home/jovyan/final_project/SolarFlareLightCurves/flare_plots/lctest'+str(ind)+'.png')
+        plt.savefig('/home/jovyan/final_project/SolarFlareLightCurves/\
+                    flare_plots/lctest'+str(ind)+'.png')
         print(" ")
-        
-        float_array = np.linspace(0,ind,ind+1)
-        int_array = float_array.astype(int)
-    allTimes = np.vstack((int_array, startTimes ,maxTimes, endTimes)).T
-        
-    np.savetxt("parameters.csv", allTimes, delimiter=",", header="Flare Index, Start Time, Peak Time, End Time", comments='',fmt="%s")
-        
 
-        
+        float_array = np.linspace(0, ind, ind+1)
+        int_array = float_array.astype(int)
+
+    # Combine time arrays and save to .csv file for ease of access.
+    allTimes = np.vstack((int_array, startTimes, maxTimes, endTimes)).T
+
+    np.savetxt("parameters.csv", allTimes, delimiter=",",
+               header="Flare Index, Start Time, Peak Time, End Time",
+               comments='', fmt="%s")
+
+
 if __name__ == "__main__":
     main()
