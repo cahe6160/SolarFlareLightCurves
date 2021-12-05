@@ -142,15 +142,15 @@ def main():
             proj_funcs.find_other_parameters(timeev, tst, irrev, sqev, irrstd,
                                              starti, endj, diff, ind)
         
-        if tst ~= 0 and tend ~= 0 and tmax ~= 0:
+        if tst > 0 and tend > 0 and maxt > 0:
             # Print the start time to the flare.
             print('Start time: ', tst)
 
-            # Print end time
-            print('End time: ',tend)
-
             # Print max time
             print('Max time: ',maxt)
+            
+            # Print end time
+            print('End time: ',tend)
 
         if endj == 0 and tend == 0 and maxind == 0 and maxt == 0:
             continue
@@ -166,8 +166,9 @@ def main():
         ax.set_xlabel('Time [datetime]', fontsize=12)
         ax.set_ylabel('Flux '+r'$[\mu W/m^2/s]$', fontsize=12)
         ax.set_title('Detected Parameters, Flare '+str(ind), fontsize=20)
-        plt.savefig('/home/jovyan/final_project/SolarFlareLightCurves/lctest'+str(ind)+'.png')
+        plt.savefig('/home/jovyan/final_project/SolarFlareLightCurves/flare_plots/lctest'+str(ind)+'.png')
+        print(" ")
 
-
+        
 if __name__ == "__main__":
     main()
