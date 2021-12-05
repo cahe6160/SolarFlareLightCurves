@@ -104,13 +104,8 @@ def main():
         j, starti, tst = proj_funcs.find_flare_start_time(diff, irrev, irrstd,
                                                           j, smSubTime,
                                                           subTime, timeev,
-                                                          tst, num, points)
-
-        # As a sanity check, print the number of exceeding points found, the start
-        # time, and the start index.
-        print('points', points)
-        print('tst', tst)
-        print('starti', starti)
+                                                          tst, num, points, 
+                                                         ind)
 
         # Lower the criteria to find a flare, if the start time has not been found
         # or the start time index is very large (unlikely to have found a flare).
@@ -130,7 +125,8 @@ def main():
                                                                       subTime,
                                                                       timeev,
                                                                       tst, num,
-                                                                      points)
+                                                                      points,
+                                                                     ind)
                 else:
                     break
 
@@ -144,9 +140,18 @@ def main():
         # Run function to find end and peak times.
         endj, tend, maxind, maxt = \
             proj_funcs.find_other_parameters(timeev, tst, irrev, sqev, irrstd,
-                                             starti, endj, diff)
-    
-        print(endj, tend, maxind, maxt)
+                                             starti, endj, diff, ind)
+        
+        if tst ~= 0 and tend ~= 0 and tmax ~= 0:
+            # Print the start time to the flare.
+            print('Start time: ', tst)
+
+            # Print end time
+            print('End time: ',tend)
+
+            # Print max time
+            print('Max time: ',maxt)
+
         if endj == 0 and tend == 0 and maxind == 0 and maxt == 0:
             continue
 
@@ -161,7 +166,7 @@ def main():
         ax.set_xlabel('Time [datetime]', fontsize=12)
         ax.set_ylabel('Flux '+r'$[\mu W/m^2/s]$', fontsize=12)
         ax.set_title('Detected Parameters, Flare '+str(ind), fontsize=20)
-        plt.savefig('lctest'+str(ind)+'.png')
+        plt.savefig('/home/jovyan/final_project/SolarFlareLightCurves/lctest'+str(ind)+'.png')
 
 
 if __name__ == "__main__":
