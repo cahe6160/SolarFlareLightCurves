@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import argparse
 import configparser
 import sys
+import numpy as np
 
 
 def input_parser():
@@ -66,9 +67,15 @@ def main():
         proj_funcs.load_data(xr, evef)
 
     # Establish the flare index (or indices) to iterate over
-    ind = 0
+    ind = 24
     
-    for ind in range(24):
+    # Time storage
+    startTimes = []
+    endTimes = []
+    maxTimes = []
+    
+    for ind in range(ind):
+        flareflag = 0
         print('################', ind, '################')
         # For the flare index above, determine the corresponding light curve
         irrev, irrstd, sqev, errev, sqstd, timeev, diff, irrmean = \
@@ -141,6 +148,14 @@ def main():
         endj, tend, maxind, maxt = \
             proj_funcs.find_other_parameters(timeev, tst, irrev, sqev, irrstd,
                                              starti, endj, diff, ind)
+        if endj == 0 and tend == 0 and maxind == 0 and maxt == 0:
+            tend = np.nan
+            maxt = np.nan
+            tst = np.nan
+            flareflag = 1
+
+        startTimes, endTimes, maxTimes = proj_funcs.store_times(endj, starti, timeev, tst, tend, maxt, startTimes, endTimes,
+                maxTimes)
         
         if tst > 0 and tend > 0 and maxt > 0:
             # Print the start time to the flare.
@@ -152,7 +167,7 @@ def main():
             # Print end time
             print('End time: ',tend)
 
-        if endj == 0 and tend == 0 and maxind == 0 and maxt == 0:
+        if flareflag == 1:
             continue
 
         # Plot the light curve with the parameters which have been found.
@@ -168,6 +183,13 @@ def main():
         ax.set_title('Detected Parameters, Flare '+str(ind), fontsize=20)
         plt.savefig('/home/jovyan/final_project/SolarFlareLightCurves/flare_plots/lctest'+str(ind)+'.png')
         print(" ")
+        
+        float_array = np.linspace(0,ind,ind+1)
+        int_array = float_array.astype(int)
+    allTimes = np.vstack((int_array, startTimes ,maxTimes, endTimes)).T
+        
+    np.savetxt("parameters.csv", allTimes, delimiter=",", header="Flare Index, Start Time, Peak Time, End Time", comments='',fmt="%s")
+        
 
         
 if __name__ == "__main__":
