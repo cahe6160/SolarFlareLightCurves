@@ -264,15 +264,17 @@ def find_flare_start_time(diff, irrev, irrstd, j, smSubTime, subTime, timeev,
             if num == points and j > (num + points):
                 tst = timeev[j - subTime]
                 starti = j - subTime
-                break
+                return j, starti, tst
+                # break
             elif num == points and j < (num + points):
                 tst = timeev[j - smSubTime]
                 starti = j - smSubTime
-                break
+                return j, starti, tst
+                # break
             j += 1
         else:
             j += 1
-
+    starti = float('inf')
     return j, starti, tst
 
 
@@ -333,11 +335,13 @@ def find_other_parameters(timeev, tst, irrev, sqev, irrstd, starti, endj,
     # If there is overlap, or an indexing issue, exit loop and print error.
     if starti > len(timeev) or endj > len(timeev):
         print('No classification of flare!')
+        return 0, 0, 0, 0
 
     # Otherwise, if the start time is before the time array, exit loop and
     # print error.
     elif tst < timeev[1]:
         print('Start too early')
+        return 0, 0, 0, 0
 
     # Otherwise, iterative over values to find the end time.
     else:
