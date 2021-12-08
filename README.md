@@ -1,6 +1,12 @@
 * **CSCI 6118/4118 Final Project** *
-* *Parametrizing Solar Flares* *
+* **CU Boulder, Fall 2021** *
+* **Instructor: Dr. Jacob Stanley** *
+
+* *Title: Parametrizing Solar Flares in the 304 Angstrom Chromospheric Line* *
+
 * *Science Lead: Cole Tamburri* *
+* *contact: cole.tamburri@colorado.edu* *
+
 * *Computational Lead: Caroline Hernandez* *
 
 With this software, we develop an autonomous method for detection of solar flare light curves in the Solar Dynamics Observatory Extreme Ultraviolet Experiment (SDO/EVE) 304 Angstrom line.  Flares correspond to those identified by the RibbonDB database (Kazachenko et al. 2017) within the 2010-2014 time period.  Roughly 2048 flares are included in the SDO/EVE log, though the software here has been applied to a smaller subset for the purposes of development.  Using the methods described below, the start, peak, and end times for flare light curves from these data are computed and printed to a file. 
